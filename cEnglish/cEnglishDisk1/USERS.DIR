@@ -1,0 +1,12 @@
+FILE      users 
+  RECORD  
+          LOGON FIXED  STRING 5 
+          PRMSSN FIXED  STRING 16 
+          PSSWRD FIXED  STRING 14 
+          PWDATE FIXED  STRING 8 
+  END RECORD 
+  INDEX    ULOGON 
+          LOGON   
+   END INDEX 
+END FILE 
+

@@ -1,0 +1,482 @@
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                             SYSMANG.CE                                |
+ |                                                                       |
+ |   (C)opyright 1985 Personal Touch Software,  All Rights Reserved      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+identifications
+
+   module:  sysmang_ce
+   author:  clw
+   date:    09/28/85
+   remarks: (C)opyright 1985  Personal Touch Software  All Rights Reserved
+
+end identifications
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               CONSTANTS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+constants
+
+   ESC = 27
+
+end constants
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                              EXTERNALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+externals
+
+   functions:
+      integer FRAME
+      integer MENU
+      integer GETMKEY
+      integer STATUS
+      integer PROMPT
+      integer CLRSCRN
+      integer TAIL
+      fixed YESNO
+      fixed RD_USERS
+      fixed WT_USERS
+
+end externals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                                GLOBALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+globals
+
+end globals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FUNCTIONS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+functions
+
+/*
+ -------------------------------------------------------------------------
+ |									 |
+ |                             SYSMANG                                   |
+ |                                                                       |
+ |          Controls the USERS.DAT add kill users, kill passwords        |
+ |                                                                       |
+ |          V - Veiw vendors permission                                  |
+ |          A - Add vendors  permision                                   |
+ |          E - Edit vendors permision                                   |
+ |          L - List vendors permision                                   |
+ |          M - Generate Manifest permision                              |
+ |          U - User Maintenance permision                               |
+ |									 |
+ -------------------------------------------------------------------------
+*/
+
+function SYSMANG(ACT_LOGON)
+
+fixed ACT_LOGON
+
+begin
+
+   logical CONTINUE
+   integer CHOICE
+   integer COUNTER
+   fixed length 5 LOGON
+   fixed length 14 PSSWRD
+   fixed length 16 PRMSSN
+   fixed length 8 PWDATE
+   fixed length 16 CODE
+   fixed length 16 PERMISSION
+   fixed length 1 YN
+   fixed length 11 P_VENDVIEW
+   fixed length 11 P_VENDADD
+   fixed length 11 P_VENDEDIT
+   fixed length 11 P_VENDLIST
+   fixed length 11 P_MANIFEST
+   fixed length 11 P_USERMAIN
+
+   do CLRSCRN(4,21)
+
+   use "USERS" as US
+
+   do FRAME("System Management Menu",fixed todays_date,"Press ESC to STOP")
+
+   store TRUE to CONTINUE
+
+   while CONTINUE
+
+      do MENU(5,"Add a new user","Remove an exisiting user",
+         "Clear a user's password","Change a user's permissions",
+         "List users on the system")
+
+      when GETMKEY(5)
+
+         is eq ESC
+
+            store FALSE to CONTINUE
+
+         is eq 1
+
+	    do CLRSCRN(4,21)
+
+	    do TAIL(fixed todays_date,"Press RETURN to ENTER")
+
+	    store "     " to LOGON
+
+            while LOGON eq "     "
+	       at 8,15 say "Enters users identification to add. "
+	       at 10,15 say "Identification ... "
+               at 10,36 get LOGON using "!!!!!"
+
+       	       read screen
+               clear gets
+
+            end while
+
+	    clear row 8
+	    clear row 10
+
+	    find first for ULOGON eq LOGON
+
+	    if not FOUND
+	       store YESNO(8,"Allow the user to view vendors ?","N") to P_VENDVIEW
+
+	       store YESNO(8,"Allow the user to add vendors ?","N") to P_VENDADD
+
+	       store YESNO(8,"Allow the user to edit vendors ?","N") to P_VENDEDIT
+
+	       store YESNO(8,"Allow the user to list vendors ?","N") to P_VENDLIST
+
+	       store YESNO(8,"Allow the user to generate manifest ?","N") to P_MANIFEST
+
+	       store YESNO(8,"Allow the user access to user maintenance ?","N") to P_USERMAIN
+
+	       store "B" & P_VENDVIEW & P_VENDADD & P_VENDEDIT to PERMISSION
+	       store PERMISSION & P_VENDLIST & P_MANIFEST & P_USERMAIN to PERMISSION
+	       store " VAELMU" to CODE
+	       store "B" to PRMSSN
+
+	       store 2 to COUNTER
+
+	       while COUNTER lt 8
+	          if substring(PERMISSION,COUNTER,1) eq "Y"
+		     store PRMSSN & substring(CODE,COUNTER,1) to PRMSSN
+	          else
+		     store PRMSSN & "N" to PRMSSN
+	          end if
+
+	          store COUNTER + 1 to COUNTER
+
+	       end while
+
+               append blank
+
+               do WT_USERS(LOGON,"              ",PRMSSN,"        ")
+
+               do STATUS(20,"NOTICE : " & trim(LOGON) & " has been added as a user.")
+
+	    else
+	       do STATUS(20,"SORRY : " & trim(LOGON) & " is already a user.")
+
+	    end if
+ 
+         is eq 2
+ 
+	    do CLRSCRN(4,20)
+
+	    do TAIL(fixed todays_date,"Press RETURN to ENTER")
+
+	    store "     " to LOGON
+
+            while LOGON eq "     "
+	       at 8,15 say "Enters users identification to delete."
+	       at 10,15 say "Identification ... "
+               at 10,36 get LOGON using "!!!!!"
+
+	       read screen
+	       clear gets
+
+            end while
+
+	    clear row 8
+	    clear row 10
+
+	    store trim(LOGON) to LOGON
+
+	    if LOGON NE ACT_LOGON
+
+	       find first for ULOGON eq LOGON
+
+	       if not FOUND
+	          do STATUS(20,"SORRY : " & trim(LOGON) & " is not a user.")
+
+	       else
+	          if LOGON eq "ADMIN"
+		     do STATUS(20,"SORRY : ADMIN can not be removed.")
+
+	          else
+                     delete record
+		     do STATUS(20,"NOTICE : " & trim(LOGON) & " is now removed.")
+
+	          end if
+
+	       end if
+
+	    else
+	       do STATUS(20,"NOTICE : " & ACT_LOGON & " you can not remove yourself.")
+
+	    end if
+
+         is eq 3
+
+	    do CLRSCRN(4,21)
+
+	    do TAIL(fixed todays_date,"Press RETURN to ENTER")
+
+	    store "     " to LOGON
+
+            while LOGON eq "     "
+	       at 8,15 say "Enters users identification to clear password."
+	       at 10,15 say "Identification ... "
+               at 10,36 get LOGON using "!!!!!"
+
+	       read screen
+               clear gets
+
+            end while
+
+	    clear row 8
+	    clear row 10
+
+	    store trim(LOGON) to LOGON
+
+	    if LOGON ne ACT_LOGON
+	       find first for ULOGON eq LOGON
+
+	       if not FOUND
+	          do STATUS(20,"SORRY : " & trim(LOGON) & " is not a user.")
+
+	       else
+                  do RD_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+                  do WT_USERS(LOGON,"              ","B" & substring(PRMSSN,2,7),"        ");
+
+	          do STATUS(20,"NOTICE : " & trim(LOGON) & "'s password is now cleared.")
+ 
+	       end if
+
+	    else
+	       do STATUS(20,"SORRY : " & ACT_LOGON & " you can not clear your own password.")
+
+	    end if
+
+         is eq 4
+
+	    do CLRSCRN(4,21)
+
+	    do TAIL(fixed todays_date,"Press RETURN to ENTER")
+ 
+	    store "     " to LOGON
+
+            while LOGON eq "     "
+	       at 8,15 say "Enters users identification to edit. "
+	       at 10,15 say "Identification ... "
+               at 10,36 get LOGON using "!!!!!"
+
+ 	       read screen
+               clear gets
+
+            end while
+
+	    clear row 8
+	    clear row 10   		
+
+	    store trim(LOGON) to LOGON
+
+	    if LOGON ne ACT_LOGON
+
+	       find first for ULOGON eq LOGON
+
+	       if FOUND
+	          if LOGON eq "ADMIN"
+		     do STATUS(20,"SORRY : ADMIN's permissions can not be edited.")
+
+	          else
+                     do RD_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+		     if substring(PRMSSN,2,1) eq "V"
+		        store "Y" to YN
+		     else
+		        store "N" to YN
+		     end if
+
+		     store YESNO(8,"Allow the user to view vendors ?",YN) to P_VENDVIEW
+
+		     if substring(PRMSSN,3,1) eq "A"
+		        store "Y" to YN
+		     else
+		        store "N" to YN
+		     end if
+
+		     store YESNO(8,"Allow the user to add vendors ?",YN) to P_VENDADD
+
+		     if substring(PRMSSN,4,1) eq "E"
+		        store "Y" to YN
+		     else
+		        store "N" to YN
+		     end if
+
+		     store YESNO(8,"Allow the user edit vendors ?",YN) to P_VENDEDIT
+
+		     if substring(PRMSSN,5,1) eq "L"
+		        store "Y" to YN
+		     else
+		        store "N" to YN
+		     end if
+
+		     store YESNO(8,"Allow the user to list vendors ?",YN) to P_VENDLIST
+
+		     if substring(PRMSSN,6,1) eq "M"
+		        store "Y" to YN
+		     else
+		        store "N" to YN
+		     end if
+
+		     store YESNO(8,"Allow the user to generate manifest ?",YN) to P_MANIFEST
+
+		     if substring(PRMSSN,7,1) eq "U"
+		        store "Y" to YN
+		     else
+		        store "N" to YN
+		     end if
+
+		     store YESNO(8,"Allow the user access to user maintenance ?",YN) to P_USERMAIN
+
+                     store "P" & P_VENDVIEW & P_VENDADD & P_VENDEDIT to PERMISSION
+	             store PERMISSION & P_VENDLIST & P_MANIFEST & P_USERMAIN to PERMISSION
+	             store " VAELMU" to CODE
+                     store substring(PRMSSN,1,1) to PRMSSN
+
+	             store 2 to COUNTER
+
+	             while COUNTER lt 8
+	                if substring(PERMISSION,COUNTER,1) eq "Y"
+		           store PRMSSN & substring(CODE,COUNTER,1) to PRMSSN
+	                else
+		           store PRMSSN & "N" to PRMSSN
+	                end if
+
+	                store COUNTER + 1 to COUNTER
+
+	             end while
+
+                     do WT_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+	          end if
+
+	       else
+	          do STATUS(20,"SORRY : " & trim(LOGON) & " is not a user.")
+
+	       end if
+
+	    else
+	       do STATUS(20,"SORRY : " & ACT_LOGON & " you can not edit your permissions.")
+
+	    end if
+
+         is eq 5
+
+	    do CLRSCRN(4,21)
+
+	    skip to top
+	    while not END_OF_FILE
+
+               do RD_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+	       if substring(PRMSSN,2,1) eq "V"
+	          store "allowed" to P_VENDVIEW
+	       else
+	          store "NOT allowed" to P_VENDVIEW
+	       end if
+
+	       if substring(PRMSSN,3,1) eq "A"
+	          store "allowed" to P_VENDADD
+	       else
+	          store "NOT allowed" to P_VENDADD
+	       end if
+
+	       if substring(PRMSSN,4,1) eq "E"
+	          store "allowed" to P_VENDEDIT
+	       else
+	          store "NOT allowed" to P_VENDEDIT
+	       end if
+
+	       if substring(PRMSSN,5,1) eq "L"
+	          store "allowed" to P_VENDLIST
+	       else
+	          store "NOT allowed" to P_VENDLIST
+	       end if
+
+	       if substring(PRMSSN,6,1) eq "M"
+	          store "allowed" to P_MANIFEST
+	       else
+	          store "NOT allowed" to P_MANIFEST
+	       end if
+
+	       if substring(PRMSSN,7,1) eq "U"
+	          store "allowed" to P_USERMAIN
+	       else
+	          store "NOT allowed" to P_USERMAIN
+	       end if
+
+	       at  8,15 say "USER's identification is ......... " & LOGON
+	       at 10,15 say "VIEW permission is ............... " & P_VENDVIEW
+	       at 11,15 say "ADD permission is ................ " & P_VENDADD
+	       at 12,15 say "EDIT permission is ............... " & P_VENDEDIT
+	       at 13,15 say "LIST permission is ............... " & P_VENDLIST
+	       at 14,15 say "MANIFEST permission is ........... " & P_MANIFEST
+	       at 15,15 say "USER MAINTENANCE permission is ... " & P_USERMAIN
+
+	       do STATUS(20,"NOTICE : You are scrolling through the user listing.")
+
+	       skip forward 1
+
+	       do CLRSCRN(4,21)
+
+            end while
+
+       end when
+
+   end while
+
+   unuse all
+
+   do CLRSCRN(4,21)
+
+end function
+
+end functions
+
+

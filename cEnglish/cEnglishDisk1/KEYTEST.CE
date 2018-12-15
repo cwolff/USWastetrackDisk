@@ -1,0 +1,204 @@
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                             KEYTEST.CE                                |
+ |                                                                       |
+ |   (C)opyright 1985 Personal Touch Software,  All Rights Reserved      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+identifications
+
+   module:  keytest
+   author:  clw
+   date:    09/28/85
+   remarks: (C)opyright 1985  Personal Touch Software  All Rights Reserved
+			
+end identifications
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               CONSTANTS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+constants
+
+end constants
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                              EXTERNALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+externals
+
+end externals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                                GLOBALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+globals
+
+end globals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FUNCTIONS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+functions
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |                                                              		*
+ |                      CLRSCRN(RROW,CCOL)                               |
+ |								         |
+ -------------------------------------------------------------------------
+*/
+
+function CLRSCRN(RROW1,RROW2)
+
+integer RROW1
+integer RROW2
+
+begin
+
+   clear row RROW1 thru RROW2
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |  									 |
+ |                     FRAME(HEAD,L_TAIL,R_TAIL)                         |
+ |					                                 |
+ -------------------------------------------------------------------------
+*/
+
+function FRAME(HEAD,L_TAIL,R_TAIL)
+
+fixed HEAD
+fixed L_TAIL
+fixed R_TAIL
+
+begin
+
+   fixed length 80 T1_LINE
+   fixed length 80 T2_LINE
+   fixed length 80 BLANK_LINE
+   fixed length 80 HEAD_LINE
+
+   fixed length 80 THE_LINE
+   fixed length 80 B_LINE
+   fixed length 80 TAIL_LINE
+   fixed length 80 CPYRGHT 
+
+   store " ---------------------------------------" to T1_LINE
+   concatenate "---------------------------------------" to T1_LINE
+
+   store " ---------------------------------------" to T2_LINE
+   concatenate "---------------------------------------" to T2_LINE
+
+   store "                                              " to BLANK_LINE
+   store " | <> U. S. - W a s t e t r a c  " to HEAD_LINE
+   store HEAD_LINE & substring(BLANK_LINE,1,(51 - length(HEAD_LINE)) / 2) & HEAD to HEAD_LINE
+   store HEAD_LINE & substring(BLANK_LINE,1,78 - length(HEAD_LINE)) & "|" to HEAD_LINE
+
+   store "============================================================" to THE_LINE
+
+   store " =[ " & L_TAIL & " ]" to B_LINE
+   store B_LINE & substring(THE_LINE,1,80 - ((length(B_LINE) + length(R_TAIL) + 6))) to B_LINE
+   store B_LINE & "[ " & R_TAIL & " ]=" to B_LINE
+
+   store "                                      " to TAIL_LINE
+   store " |" & TAIL_LINE & TAIL_LINE & "|" to TAIL_LINE
+
+   store " --- Utility Services, Inc.  Manifesting-Tr" to CPYRGHT
+   store CPYRGHT & "acking-Reporting  (614) 837-8827 ---" to CPYRGHT
+
+   at 1,1 say T1_LINE
+   at 2,1 say HEAD_LINE
+   at 3,1 say T2_LINE
+
+   at 22,1 say B_LINE
+   at 23,1 say TAIL_LINE
+   at 24,1 say CPYRGHT
+
+end function
+
+end functions
+
+/*
+
+*/
+
+main program
+
+begin
+
+   logical CONTINUE
+   fixed length 1 THEKEY
+
+   clear fkey[1] thru fkey[40]
+
+   do CLRSCRN(1,25)
+
+   do FRAME("Key Board Test Program",fixed todays_date,"Press ESC to STOP")
+
+   at 5,15 say "Press any key to display it's character and ascii value."
+
+   at 10,18 say "Key's character value            Key's ascii value"
+
+   store TRUE to CONTINUE
+
+   while CONTINUE
+
+      wait to THEKEY
+
+      clear row 12 thru 14
+
+      if asciicode(THEKEY) eq 0
+         at 12,25 say "[ " & THEKEY & " ]"
+         at 12,58 say "[ " & asciicode(THEKEY) & " ]"
+
+         wait to THEKEY
+
+         at 13,25 say "[ " & THEKEY & " ]"
+         at 13,58 say "[ " & asciicode(THEKEY) & " ]"
+
+      else
+         at 12,25 say "[ " & THEKEY & " ]"
+         at 12,58 say "[ " & asciicode(THEKEY) & " ]"
+
+         if asciicode(THEKEY) eq 27
+            store FALSE to CONTINUE
+         end if
+
+      end if
+
+   end while
+
+   at 20,21 say "That's All Folks, hit any key to stop."
+
+   wait
+
+   do CLRSCRN(1,24)
+
+end program
+
+

@@ -1,0 +1,22 @@
+FILE      vendor 
+  RECORD  
+          EPA_NO FIXED  STRING 12 
+          COMPANY FIXED  STRING 30 
+          ADDRESS FIXED  STRING 30 
+          CITY FIXED  STRING 25 
+          STATE FIXED  STRING 2 
+          ZIP FIXED  STRING 9 
+          PHONE FIXED  STRING 10 
+          CONTACT FIXED  STRING 20 
+  END RECORD 
+  INDEX    VENEPA 
+          EPA_NO   
+   END INDEX 
+  INDEX    VENCOM 
+          COMPANY   
+   END INDEX 
+  INDEX    VENZIP 
+          ZIP   
+   END INDEX 
+END FILE 
+

@@ -1,0 +1,164 @@
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               VENDMANG                                |
+ |                                                                       |
+ |   (C)opyright 1985 Personal Touch Software,  All Rights Reserved      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+identifications
+
+   module:  vendmang_ce
+   author:  clw
+   date:    10/11/85
+   remarks: (C)opyright 1985  Personal Touch Software  All Rights Reserved
+
+end identifications
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               CONSTANTS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+constants
+
+   ESC = 27
+
+end constants
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                              EXTERNALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+externals
+
+   functions:
+      integer FRAME
+      integer MENU
+      integer GETMKEY
+      integer STATUS
+
+end externals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                                GLOBALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+globals
+
+end globals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FUNCTIONS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+functions
+
+/*
+ -------------------------------------------------------------------------
+ |									 |
+ |                               VENDMANG                                |
+ |									 |
+ -------------------------------------------------------------------------
+*/
+
+function VENDMANG(LOGON,PRMSSN)
+
+fixed LOGON
+fixed PRMSSN
+
+begin
+
+   logical CONTINUE
+   logical REFRESH
+
+   store TRUE to REFRESH
+   store TRUE to CONTINUE
+
+   while CONTINUE
+
+      if REFRESH
+         do FRAME("Vendor Management Menu",fixed todays_date,
+            "Press ESC to STOP")
+
+         do MENU(3,"View Local Vendor Information",
+            "Add Local Vendor Information",
+            "List Local Vendor Information")
+
+      end if
+
+      when GETMKEY(3)
+
+         is eq ESC
+	    store FALSE to CONTINUE
+
+         is eq 1
+	    if substring(PRMSSN,2,1) eq "V"
+               do STATUS(20,"SORRY : View vendor information is under development.")
+               store FALSE to REFRESH
+/*
+	       do VENDVIEW
+	       store TRUE to REFRESH
+*/
+	    else
+	       do STATUS(20,"SORRY : View vendor permission is denied.")
+	       store FALSE to REFRESH
+
+	    end if
+
+         is eq 2
+	    if substring(PRMSSN,3,1) eq "A"
+               do STATUS(20,"SORRY : Add vendor information is under development.")
+               store FALSE to REFRESH
+/*
+	       do VENDADD
+	       store TRUE to REFRESH
+*/
+
+	    else
+	       do STATUS(20,"SORRY : Add vendor permission is denied.")
+	       store FALSE to REFRESH
+
+	    end if
+
+         is eq 3
+	    if substring(PRMSSN,5,1) eq "L"
+               do STATUS(20,"SORRY : List vendor information is under development.")
+               store FALSE to REFRESH
+/*
+	       do VENDLIST
+	       store TRUE to REFRESH
+*/
+	    else
+	       do STATUS(20,"SORRY : List vendor permission is denied.")
+	       store FALSE to REFRESH
+
+	    end if
+
+      end when
+
+   end while
+
+end function
+
+end functions
+
+
+

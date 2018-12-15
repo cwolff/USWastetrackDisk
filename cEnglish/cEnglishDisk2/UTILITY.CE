@@ -1,0 +1,593 @@
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                             UTILITY.CE                                |
+ |                                                                       |
+ |   (C)opyright 1985 Personal Touch Software,  All Rights Reserved      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+identifications
+
+   module:  utility_ce
+   author:  clw
+   date:    09/28/85
+   remarks: (C)opyright 1985  Personal Touch Software  All Rights Reserved
+			
+end identifications
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               CONSTANTS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+constants
+
+   ESC = 27
+
+end constants
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                              EXTERNALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+externals
+
+end externals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                                GLOBALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+globals
+
+end globals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FUNCTIONS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+functions
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |                                                              		*
+ |                      CLRSCRN(RROW,CCOL)                               |
+ |								         |
+ -------------------------------------------------------------------------
+*/
+
+function CLRSCRN(RROW1,RROW2)
+
+integer RROW1
+integer RROW2
+
+begin
+
+   clear row RROW1 thru RROW2
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |  									|
+ |                     FRAME(HEAD,L_TAIL,R_TAIL)                         |
+ |					                                |
+ -------------------------------------------------------------------------
+*/
+
+function FRAME(HEAD,L_TAIL,R_TAIL)
+
+fixed HEAD
+fixed L_TAIL
+fixed R_TAIL
+
+begin
+
+   fixed length 80 T1_LINE
+   fixed length 80 T2_LINE
+/+   fixed length 80 BLANK_LINE
+   fixed length 80 HEAD_LINE
+
+/+   fixed length 80 THE_LINE
+   fixed length 80 B_LINE
+   fixed length 80 TAIL_LINE
+   fixed length 80 CPYRGHT 
+
+/#C*
+
+   {
+      int loop;
+      int offset;
+      char buffer[81];
+
+      for (loop=1; loop<79; loop++)
+      {
+         T1_LINE[loop] = (char) 0xc4;
+         HEAD_LINE[loop] = ' ';
+         T2_LINE[loop] = (char) 0xc4;
+
+         B_LINE[loop] = (char) 0xcd;
+         TAIL_LINE[loop] = ' ';
+         CPYRGHT[loop] = (char) 0xc4;
+
+      }
+
+      T1_LINE[0] = ' ';
+      T1_LINE[1] = (char) 0xda;
+      T1_LINE[78] = (char) 0xbf;
+      T1_LINE[79] = ' ';
+      T1_LINE[80] = '\0';
+
+      HEAD_LINE[0] = ' ';
+      HEAD_LINE[1] = (char) 0xb3;
+      HEAD_LINE[78] = (char) 0xb3;
+      HEAD_LINE[79] = ' ';
+      HEAD_LINE[80] = '\0';
+
+      T2_LINE[0] = ' ';
+      T2_LINE[1] = (char) 0xc0;
+      T2_LINE[78] = (char) 0xd9;
+      T2_LINE[79] = ' ';
+      T2_LINE[80] = '\0';
+
+      strcpy(buffer, "<> U. S. - W a s t e t r a c ");
+
+      offset = 3;
+      for (loop = 0; buffer[loop] != '\0'; loop++)
+      {
+         HEAD_LINE[loop+offset] = buffer[loop];
+      }
+
+      offset = (55 - (strlen(HEAD)/2));
+      for(loop = 0; HEAD[loop] != '\0'; loop++)
+      {
+         HEAD_LINE[loop+offset] = HEAD[loop];
+      }
+
+      B_LINE[0] = ' ';
+      B_LINE[1] = (char) 0xd5;
+      B_LINE[2] = '[';
+      B_LINE[3] = ' ';
+
+      offset = 4;
+      for (loop=0; L_TAIL[loop] != '\0'; loop++)
+      {
+         B_LINE[loop+offset] = L_TAIL[loop];
+      }
+
+      offset = loop + offset;
+      B_LINE[offset++] = ' ';
+      B_LINE[offset] = ']';
+
+      offset = 80 - (strlen(R_TAIL) + 6);
+      B_LINE[offset++] = '[';
+      B_LINE[offset++] = ' ';
+
+      for (loop = 0; R_TAIL[loop] != '\0'; loop++)
+      {
+         B_LINE[loop+offset] = R_TAIL[loop];
+      }
+
+      B_LINE[76] = ' ';
+      B_LINE[77] = ']';
+      B_LINE[78] = (char) 0xb8;
+      B_LINE[79] = ' ';
+      B_LINE[80] = '\0';
+
+      TAIL_LINE[0] = ' ';
+      TAIL_LINE[1] = (char) 0xb3;
+      TAIL_LINE[78] = (char) 0xb3;
+      TAIL_LINE[79] = ' ';
+      TAIL_LINE[80] = '\0';
+
+      CPYRGHT[0] = ' ';
+      CPYRGHT[1] = (char) 0xc0;
+
+      offset = 4;
+      strcpy(buffer, " Utility Services, Inc.  Manifesting-Tracking-Reporting  (614) 837-8827 ");
+
+      for (loop = 0; buffer[loop] != '\0'; loop++)
+      {
+         CPYRGHT[loop+offset] = buffer[loop];
+      }      
+
+      CPYRGHT[78] = (char) 0xd9;
+      CPYRGHT[79] = ' ';
+      CPYRGHT[80] = '\0';
+      
+   }
+
+#/
+
+/*
+
+   store " ---------------------------------------" to T1_LINE
+   concatenate "---------------------------------------" to T1_LINE
+
+   store " ---------------------------------------" to T2_LINE
+   concatenate "---------------------------------------" to T2_LINE
+
+   store "                                              " to BLANK_LINE
+   store " | <> U. S. - W a s t e t r a c  " to HEAD_LINE
+   store HEAD_LINE & substring(BLANK_LINE,1,(51 - length(HEAD_LINE)) / 2) & HEAD to HEAD_LINE
+   store HEAD_LINE & substring(BLANK_LINE,1,78 - length(HEAD_LINE)) & "|" to HEAD_LINE
+
+   store "============================================================" to THE_LINE
+
+   store " =[ " & L_TAIL & " ]" to B_LINE
+   store B_LINE & substring(THE_LINE,1,80 - ((length(B_LINE) + length(R_TAIL) + 6))) to B_LINE
+   store B_LINE & "[ " & R_TAIL & " ]=" to B_LINE
+
+   store "                                      " to TAIL_LINE
+   store " |" & TAIL_LINE & TAIL_LINE & "|" to TAIL_LINE
+
+   store " --- Utility Services, Inc.  Manifesting-Tr" to CPYRGHT
+   store CPYRGHT & "acking-Reporting  (614) 837-8827 ---" to CPYRGHT
+
+*/
+
+   at 1,1 say T1_LINE
+   at 2,1 say HEAD_LINE
+   at 3,1 say T2_LINE
+
+   at 22,1 say B_LINE
+   at 23,1 say TAIL_LINE
+   at 24,1 say CPYRGHT
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                       GETMKEY(RANGE,CHOICE)                           |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function GETMKEY(HIGH)
+
+integer HIGH
+
+begin
+
+   fixed length 1 KEY
+   logical CONTINUE
+
+   store TRUE to CONTINUE
+
+   while CONTINUE
+      wait to KEY
+
+      if asciicode(KEY) ne ESC
+         if asciicode(KEY) ne 0
+            if search(KEY,substring("123456789",1,HIGH)) ne 0
+               return with integer KEY
+
+            end if
+
+         end if
+
+      else
+         return with ESC
+
+      end if
+
+   end while
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                              	 |
+ |        MENU(MENU_CNT,MENU_1,MENU_2,MENU_3,MENU_4,MENU_5)              |
+ |							                 |
+ -------------------------------------------------------------------------
+*/
+
+function MENU(MENU_CNT,MENU_1,MENU_2,MENU_3,MENU_4,MENU_5)
+
+integer MENU_CNT
+fixed MENU_1
+fixed MENU_2
+fixed MENU_3
+fixed MENU_4
+fixed MENU_5
+
+begin
+
+   clear row 6 thru 17
+
+   when MENU_CNT
+
+      is EQ 1
+         at 9,15 say "1)   " & MENU_1
+
+      is EQ 2
+         at 9,15 say "1)   " & MENU_1
+         at 11,15 say "2)   " & MENU_2
+
+      is EQ 3
+         at 9,15 say "1)   " & MENU_1
+         at 11,15 say "2)   " & MENU_2
+         at 13,15 say "3)   " & MENU_3
+
+      is EQ 4	       
+         at 9,15 say "1)   " & MENU_1
+         at 11,15 say "2)   " & MENU_2
+         at 13,15 say "3)   " & MENU_3
+         at 15,15 say "4)   " & MENU_4
+
+      is EQ 5
+         at 9,15 say "1)   " & MENU_1
+         at 11,15 say "2)   " & MENU_2
+         at 13,15 say "3)   " & MENU_3
+         at 15,15 say "4)   " & MENU_4
+         at 17,15 say "5)   " & MENU_5
+
+   end when
+
+   at 6,15 say "Press the number key next to your choice."
+
+   at 2,77 say ""
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                              	 |
+ |                  VERT_MENU(MENU_LINE,MENU_MSG,HIGH)                   |
+ |                                                              	 |
+ -------------------------------------------------------------------------
+*/
+
+function VERT_MENU(MENU_LINE,MENU_MSG,HIGH)
+
+integer MENU_LINE
+fixed MENU_MSG
+fixed HIGH
+
+begin
+
+   fixed length 1 KEY
+   logical CONTINUE
+
+   at MENU_LINE,(40-(length(MENU_MSG)/2)) say MENU_MSG
+
+   TAIL(fixed todays_date,"Press NUMBER KEY to SELECT")
+
+   at 2,77 say ""
+
+   store TRUE to CONTINUE
+
+   while CONTINUE
+      wait to KEY
+
+      if asciicode(KEY) ne 0
+         if search(KEY,substring("123456789",1,HIGH)) ne 0
+            clear row MENU_LINE
+            TAIL(fixed todays_date,"Press ESC to STOP")
+            return with integer KEY
+
+         end if
+
+      end if
+
+   end while
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                              	 |
+ |                        PROMPT(PMT_LINE,PMT_MSG)                       |
+ |                                                              	 |
+ -------------------------------------------------------------------------
+*/
+
+function PROMPT(PMT_LINE,PMT_MSG)
+
+integer PMT_LINE
+fixed PMT_MSG
+
+begin
+
+   at PMT_LINE,(40-(length(PMT_MSG)/2)) say PMT_MSG
+
+   at 2,77 say ""
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                              	 |
+ |                    STATUS(STAT_LINE,STAT_MSG)                         |
+ |									 |
+ -------------------------------------------------------------------------
+*/
+
+function STATUS(STAT_LINE,STAT_MSG)
+
+integer STAT_LINE
+fixed STAT_MSG
+
+begin
+
+   at STAT_LINE,(40-(length(STAT_MSG)/2)) say STAT_MSG
+
+   do TAIL(fixed todays_date,"Press ANY KEY to CONTINUE")
+
+   wait 
+
+   clear row STAT_LINE
+
+   do TAIL(fixed todays_date,"Press ESC to STOP")
+
+end function
+
+/*
+ ------------------------------------------------------------------------
+ |									|
+ |                       TAIL(L_TAIL,R_TAIL)                            |
+ |									|
+ -------------------------------------------------------------------------
+*/
+
+function TAIL(L_TAIL,R_TAIL)
+
+fixed L_TAIL
+fixed R_TAIL
+
+begin
+
+   fixed length 80 B_LINE
+
+/#C*
+
+   {
+      int loop;
+      int offset;
+
+      for (loop=1; loop<79; loop++)
+      {
+         B_LINE[loop] = (char) 0xcd;
+      }
+
+      B_LINE[0] = ' ';
+      B_LINE[1] = (char) 0xd5;
+      B_LINE[2] = '[';
+      B_LINE[3] = ' ';
+
+      offset = 4;
+      for (loop=0; L_TAIL[loop] != '\0'; loop++)
+      {
+         B_LINE[loop+offset] = L_TAIL[loop];
+      }
+
+      offset = loop + offset;
+      B_LINE[offset++] = ' ';
+      B_LINE[offset] = ']';
+
+      offset = 80 - (strlen(R_TAIL) + 6);
+      B_LINE[offset++] = '[';
+      B_LINE[offset++] = ' ';
+
+      for (loop = 0; R_TAIL[loop] != '\0'; loop++)
+      {
+         B_LINE[loop+offset] = R_TAIL[loop];
+      }
+
+      B_LINE[76] = ' ';
+      B_LINE[77] = ']';
+      B_LINE[78] = (char) 0xb8;
+      B_LINE[79] = ' ';
+      B_LINE[80] = '\0';
+      
+   }
+
+#/
+
+/*
+
+   store "============================================================" to TAIL_LINE
+
+   store " =[ " & L_TAIL & " ]" to B_LINE
+   store B_LINE & substring(TAIL_LINE,1,80 - ((length(B_LINE) + length(R_TAIL) + 6))) to B_LINE
+   store B_LINE & "[ " & R_TAIL & " ]=" to B_LINE
+
+ */
+
+   at 22,0 say B_LINE
+
+   at 2,77 say ""
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |  									 |
+ |                     YESNOS(YN_LINE,YN_MSG,YN                          |
+ |									 |
+ -------------------------------------------------------------------------
+*/
+
+fixed function YESNO(YN_LINE,YN_MSG,YN)
+
+integer YN_LINE
+fixed YN_MSG
+fixed YN
+
+begin
+
+   fixed length 3 Y_N
+   fixed length 1 CHOICE
+
+   at YN_LINE,15 say YN_MSG
+   store " " to Y_N
+
+   while search(Y_N,"YN") EQ 0
+      store YN to Y_N
+      at YN_LINE+2,15 say "Enter a Y (yes) or an N (no) "
+      at YN_LINE+2,46 get Y_N using "!"
+
+      read screen
+      clear gets
+
+      if (Y_N EQ "Y") OR (Y_N EQ "N")
+         store Y_N to CHOICE
+
+      else
+         store " " to Y_N
+
+      end if
+
+   end while
+
+   clear row YN_LINE
+   clear row YN_LINE+2
+
+   return with CHOICE
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                            SLEEP(PAUSE)                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function SLEEP(PAUSE)
+
+integer PAUSE
+
+begin
+
+   store 5000 * PAUSE to PAUSE
+
+   while PAUSE gt 0
+      store PAUSE - 1 to PAUSE
+
+   end while
+
+end function
+
+end functions
+

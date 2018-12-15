@@ -1,0 +1,43 @@
+FILE      manifest 
+  RECORD  
+          M_M_MID FIXED  STRING 17 
+          M_M_TID1 FIXED  STRING 12 
+          M_M_TID2 FIXED  STRING 12 
+          M_M_TSD FIXED  STRING 12 
+          M_M_DATE DATE  
+          M_M_UNNA1 FIXED  STRING 10 
+          M_M_CNT1 FIXED  STRING 3 
+          M_M_CTY1 FIXED  STRING 2 
+          M_M_QNT1 FIXED  STRING 5 
+          M_M_UNT1 FIXED  STRING 2 
+          M_M_UN2 FIXED  STRING 10 
+          M_M_CNT2 FIXED  STRING 3 
+          M_M_CTY2 FIXED  STRING 2 
+          M_M_QNT2 FIXED  STRING 5 
+          M_M_UNT2 FIXED  STRING 2 
+          M_M_UN3 FIXED  STRING 10 
+          M_M_CNT3 FIXED  STRING 3 
+          M_M_CTY3 FIXED  STRING 2 
+          M_M_QNT3 FIXED  STRING 5 
+          M_M_UNT3 FIXED  STRING 2 
+          M_M_UN4 FIXED  STRING 10 
+          M_M_CNT4 FIXED  STRING 3 
+          M_M_CTY4 FIXED  STRING 2 
+          M_M_QNT4 FIXED  STRING 5 
+          M_M_UNT4 FIXED  STRING 2 
+          M_M_UN5 FIXED  STRING 10 
+          M_M_CNT5 FIXED  STRING 3 
+          M_M_CTY5 FIXED  STRING 2 
+          M_M_QNT5 FIXED  STRING 5 
+          M_M_UNT5 FIXED  STRING 2 
+          M_M_UN6 FIXED  STRING 10 
+          M_M_CNT6 FIXED  STRING 3 
+          M_M_CTY6 FIXED  STRING 2 
+          M_M_QNT6 FIXED  STRING 5 
+          M_M_UNT6 FIXED  STRING 2 
+  END RECORD 
+  INDEX    MIDNBR 
+          M_M_MID   
+   END INDEX 
+END FILE 
+

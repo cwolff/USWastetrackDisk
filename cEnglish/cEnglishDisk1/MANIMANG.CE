@@ -1,0 +1,149 @@
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               MANIMANG.CE                             |
+ |                                                                       |
+ |   (C)opyright 1985 Personal Touch Software,  All Rights Reserved      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+identifications
+
+   module:  manimang_ce
+   author:  clw
+   date:    10/11/85
+   remarks: (C)opyright 1985  Personal Touch Software  All Rights Reserved
+
+end identifications
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               CONSTANTS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+constants
+
+   ESC = 27
+
+end constants
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                              EXTERNALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+externals
+
+    functions:
+       integer FRAME
+       integer MENU
+       integer GETMKEY
+       integer STATUS
+
+end externals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                                GLOBALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+globals
+
+end globals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FUNCTIONS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+functions
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                             MANIMANG                                  |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function MANIMANG(LOGON,PRMSSN)
+
+fixed LOGON
+fixed PRMSSN
+
+begin
+
+   logical CONTINUE
+   logical REFRESH
+
+   store TRUE to REFRESH
+   store TRUE to CONTINUE
+
+   while CONTINUE
+
+      if REFRESH
+         do FRAME("Manifest Management Menu",fixed todays_date,
+            "Press ESC to STOP")
+
+         do MENU(4,"Create Hazardous Waste Manifest",
+            "View Hazardous Waste Manifest",
+            "Print Hazardous Waste Manifest",
+            "Track Hazardous Waste Manifest")
+
+      end if
+
+      when GETMKEY(5)
+
+         is eq ESC
+            store FALSE to CONTINUE
+
+         is eq 1
+            do STATUS(20,"SORRY : Create Manifest under development.")
+            store FALSE to REFRESH
+/*
+            do CREATEM
+*/
+
+         is eq 2
+            do STATUS(20,"SORRY : View Manifest under development.")
+            store FALSE to REFRESH
+/*
+            do VIEWM
+*/
+
+         is eq 3
+            do STATUS(20,"SORRY : Print Manifest under development.")
+            store FALSE to REFRESH
+/*
+            do PRINTM
+*/
+
+         is eq 4
+            do STATUS(20,"SORRY : Track manifest is under development.")
+            store FALSE to REFRESH
+/*
+            do TRACKM
+*/
+
+      end when
+
+   end while
+
+end function
+
+end functions
+
+

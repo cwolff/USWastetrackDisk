@@ -1,0 +1,714 @@
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FILEIO.CE                               |
+ |                                                                       |
+ |   (C)opyright 1985 Personal Touch Software,  All Rights Reserved      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+identifications
+
+   module:  FILEIO_CE
+   author:  clw
+   date:    09/28/85
+   remarks: (C)opyright 1985  Personal Touch Software  All Rights Reserved
+
+end identifications
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               CONSTANTS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+constants
+
+end constants
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                              EXTERNALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+externals
+
+   FILES:
+      "USERS" as USE
+      "GENERATE" as GEN
+      "TRANSPRT" as TRA
+      "TSD" as TSD
+      "MANIFEST" as MAN
+      "ITEMS" as ITM
+      "MANNO" as MNO
+      "WASTE" as WAS
+
+end externals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                                GLOBALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+globals
+
+end globals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FUNCTIONS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+functions
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                  RD_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)                 |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function RD_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+fixed LOGON
+fixed PSSWRD
+fixed PRMSSN
+fixed PWDATE
+
+begin
+
+   store USE.LOGON to LOGON
+   store USE.PSSWRD to PSSWRD
+   store USE.PRMSSN to PRMSSN
+   store USE.PWDATE to PWDATE
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                   WT_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function WT_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+fixed LOGON
+fixed PSSWRD
+fixed PRMSSN
+fixed PWDATE
+
+begin
+
+   update
+      USE.LOGON with LOGON
+      USE.PSSWRD with PSSWRD
+      USE.PRMSSN with PRMSSN
+      USE.PWDATE with PWDATE
+   end update
+
+end function
+
+end functions
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |     RD_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function RD_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed PHONE
+fixed CONTACT
+
+begin
+
+   store GEN.EPA_NO to EPA_NO
+   store GEN.COMPANY to COMPANY
+   store GEN.ADDRESS to ADDRESS
+   store GEN.CITY to CITY
+   store GEN.STATE to STATE
+
+   if substr(GEN.ZIP,6,4) = "    "
+      store substring(GEN.ZIP,1,5) to ZIP
+   
+   else
+      store substring(GEN.ZIP,1,5) & "-" &  substring(GEN.ZIP,6,4) to ZIP
+   
+   end if
+   
+   store "(" & substring(GEN.PHONE,1,3) & ")" & substring(GEN.PHONE,4,3) & "-" & substring(GEN.PHONE,7,3) to PHONE
+
+   store GEN.CONTACT to CONTACT
+   
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |      WT_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,PHONE,CONTACT)       |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function WT_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed PHONE
+fixed CONTACT
+
+begin
+
+   update
+      GEN.EPA_NO with EPA_NO
+      GEN.COMPANY with COMPANY
+      GEN.ADDRESS with ADDRESS
+      GEN.CITY with CITY
+      GEN.STATE with STATE
+      GEN.ZIP with substring(ZIP,1,5) & substring(ZIP,7,4)
+      GEN.PHONE with substring(PHONE,1,3) & substring(PHONE,5,3) & substring(PHONE,9,4)   
+      GEN.CONTACT with CONTACT
+   update end
+   
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |     RD_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function RD_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed PHONE
+fixed CONTACT
+
+begin
+
+   store TRA.EPA_NO to EPA_NO
+   store TRA.COMPANY to COMPANY
+   store TRA.ADDRESS to ADDRESS
+   store TRA.CITY to CITY
+   store TRA.STATE to STATE
+
+   if substr(TRA.ZIP,6,4) = "    "
+      store substring(TRA.ZIP,1,5) to ZIP
+   
+   else
+      store substring(TRA.ZIP,1,5) & "-" &  substring(TRA.ZIP,6,4) to ZIP
+   
+   end if
+   
+   store "(" & substring(TRA.PHONE,1,3) & ")" & substring(TRA.PHONE,4,3) & "-" & substring(TRA.PHONE,7,3) to PHONE
+
+   store TRA.CONTACT to CONTACT
+   
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |      WT_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)   |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function WT_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed PHONE
+fixed CONTACT
+
+begin
+
+   update
+      TRA.EPA_NO with EPA_NO
+      TRA.COMPANY with COMPANY
+      TRA.ADDRESS with ADDRESS
+      TRA.CITY with CITY
+      TRA.STATE with STATE
+      TRA.ZIP with substring(ZIP,1,5) & substring(ZIP,7,4)
+      TRA.PHONE with substring(PHONE,1,3) & substring(PHONE,5,3) & substring(PHONE,9,4)   
+      TRA.CONTACT with CONTACT
+   update end
+   
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |     RD_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function RD_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed PHONE
+fixed CONTACT
+
+begin
+
+   store TSD.EPA_NO to EPA_NO
+   store TSD.COMPANY to COMPANY
+   store TSD.ADDRESS to ADDRESS
+   store TSD.CITY to CITY
+   store TSD.STATE to STATE
+
+   if substr(TSD.ZIP,6,4) = "    "
+      store substring(TSD.ZIP,1,5) to ZIP
+   
+   else
+      store substring(TSD.ZIP,1,5) & "-" &  substring(TSD.ZIP,6,4) to ZIP
+   
+   end if
+   
+   store "(" & substring(TSD.PHONE,1,3) & ")" & substring(TSD.PHONE,4,3) & "-" & substring(TSD.PHONE,7,3) to PHONE
+
+   store TSD.CONTACT to CONTACT
+   
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |      WT_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)   |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function WT_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed PHONE
+fixed CONTACT
+
+begin
+
+   update
+      TSD.EPA_NO with EPA_NO
+      TSD.COMPANY with COMPANY
+      TSD,ADDRESS with ADDRESS
+      TSD.CITY with CITY
+      TSD.STATE with STATE
+      TSD.ZIP with substring(ZIP,1,5) & substring(ZIP,7,4)
+      TSD.PHONE with substring(PHONE,1,3) & substring(PHONE,5,3) & substring(PHONE,9,4)   
+      TSD.CONTACT with CONTACT
+   update end
+   
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |                   RD_WAS(MAN_NO,MAN_DATE)                          |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function RD_WAS(MAN_NO,MAN_DATE)
+
+fixed MAN_NO
+fixed MAN_DATE
+
+begin
+
+   store MAN.MAN_NO to MAN_NO	
+   store MAN.DATE to MAN_DATE
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |                      WT_WAS(MAN_NO,MAN_DATE)                       |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function WT_WAS(MAN_NO,MAN_DATE)
+
+fixed MAN_NO
+fixed MAN_DATE
+
+begin
+
+   update
+      MAN.MAN_NO with MAN_NO	
+      MAN.DATE with MAN_DATE
+   end update
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |                   RD_WAS(MAN_NO,MAN_DATE)                          |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function RD_WAS(UN_NA,DESC_1,DESC_2)
+
+fixed UN_NA
+fixed DESC_1
+fixed DESC_2
+
+begin
+
+   store WAS.UN_NA to UN_NA	
+   store WAS.DESC_1 to DESC_1
+   store WAS.DECS_2 to DESC_2
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |        RD_MAN_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)           |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function RD_MAN_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+
+begin
+
+   store MAN.G_EPA_NO to EPA_NO	
+   store MAN.G_COMPANY to COMPANY
+   store MAN.G_ADDRESS to ADDRESS
+   store MAN.G_CITY to CITY
+   store MAN.G_STATE to STATE
+   store MAN.G_ZIP to ZIP
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |          WT_MAN_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)         |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function WT_MAN_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+
+begin
+
+   update
+      MAN.G_EPA_NO with EPA_NO
+      MAN.G_COMPANY with COMPANY
+      MAN.G_ADDRESS with ADDRESS
+      MAN.G_CITY with CITY
+      MAN.G_STATE with STATE
+      MAN.G_ZIP with ZIP
+   end update
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |        RD_MAN_PRI(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)           |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function RD_MAN_PRI(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+
+begin
+
+   store MAN.P_EPA_NO to EPA_NO	
+   store MAN.P_COMPANY to COMPANY
+   store MAN.P_ADDRESS to ADDRESS
+   store MAN.P_CITY to CITY
+   store MAN.P_STATE to STATE
+   store MAN.P_ZIP to ZIP
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |          WT_MAN_PRI(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)         |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function WT_MAN_PRI(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+
+begin
+
+   update
+      MAN.P_EPA_NO with EPA_NO
+      MAN.P_COMPANY with COMPANY
+      MAN.P_ADDRESS with ADDRESS
+      MAN.P_CITY with CITY
+      MAN.P_STATE with STATE
+      MAN.P_ZIP with ZIP
+   end update
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |        RD_MAN_SEC(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)           |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function RD_MAN_SEC(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+
+begin
+
+   store MAN.S_EPA_NO to EPA_NO	
+   store MAN.S_COMPANY to COMPANY
+   store MAN.S_ADDRESS to ADDRESS
+   store MAN.S_CITY to CITY
+   store MAN.S_STATE to STATE
+   store MAN.S_ZIP to ZIP
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |          WT_MAN_SEC(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)         |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function WT_MAN_SEC(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+
+begin
+
+   update
+      MAN.S_EPA_NO with EPA_NO
+      MAN.S_COMPANY with COMPANY
+      MAN.S_ADDRESS with ADDRESS
+      MAN.S_CITY with CITY
+      MAN.S_STATE with STATE
+      MAN.S_ZIP with ZIP
+   end update
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |        RD_MAN_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)           |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function RD_MAN_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+
+begin
+
+   store MAN.T_EPA_NO to EPA_NO	
+   store MAN.T_COMPANY to COMPANY
+   store MAN.T_ADDRESS to ADDRESS
+   store MAN.T_CITY to CITY
+   store MAN.T_STATE to STATE
+   store MAN.T_ZIP to ZIP
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |          WT_MAN_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)         |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+	  
+function WT_MAN_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+
+begin
+
+   update
+      MAN.T_EPA_NO with EPA_NO
+      MAN.T_COMPANY with COMPANY
+      MAN.T_ADDRESS with ADDRESS
+      MAN.T_CITY with CITY
+      MAN.T_STATE with STATE
+      MAN.T_ZIP with ZIP
+   end update
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |       RD_ITEM(MAN_NO,ITEM,UN_NA,CNT_NO,CNT_TYP,QNTY,UNIT)          |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function RD_ITEM(MAN_NO,ITEM,UN_NA,CNT_NO,CNT_TYP,QNTY,UNIT)
+
+fixed MAN_NO
+fixed ITEMO
+fixed UN_NA
+fixed CNT_NO
+fixed CNT_TYP
+fixed QNTY
+fixed UNIT
+
+begin
+
+   store ITM.MAN_NO to MAN_NO
+   store ITM.ITEM to ITEM
+   store ITM.UN_NA to UN_NA
+   store ITM.CNT_NO to CNT_NO
+   store ITM.CNT_TYP to CNT_TYP
+   store ITM.QNTY to QNTY
+   store ITM.UNIT to UNIT
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |       WT_ITEM(MAN_NO,ITEM_NO,UN_NA,CNT_NO,CNT_TYP,QNTY,UNIT)       |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function WT_ITEM(MAN_NO,ITEM,UN_NA,CNT_NO,CNT_TYP,QNTY,UNIT)
+
+fixed MAN_NO
+fixed ITEM
+fixed UN_NA
+fixed CNT_NO
+fixed CNT_TYP
+fixed QNTY
+fixed UNIT
+
+begin
+
+   update
+      ITM.MAN_NO with MAN_NO
+      ITM.ITEM with ITEM
+      ITM.UN_NA with UN_NA
+      ITM.CNT_NO with CNT_NO
+      ITM.CNT_TYP with CNT_TYP
+      ITM.QNTY with QNTY
+      ITM.UNIT with UNIT
+   end update
+
+end function
+
+end functions
+
+
+

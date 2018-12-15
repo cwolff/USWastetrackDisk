@@ -1,0 +1,549 @@
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               TRACK.CE                                |
+ |                                                                       |
+ |   (C)opyright 1985 Personal Touch Software,  All Rights Reserved      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+identifications
+
+   module:  track_ce
+   author:  clw
+   date:    09/28/85
+   remarks: (C)opyright 1985  Personal Touch Software  All Rights Reserved
+
+end identifications
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               CONSTANTS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+constants
+
+   ESC = 27
+   BS = 8
+
+end constants
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                              EXTERNALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+externals
+
+   functions:
+
+      integer MANIMANG
+      integer VENDMANG
+      integer SYSMANG
+      integer FRAME
+      integer GETMKEY
+      integer MENU
+      integer STATUS
+      integer CLRSCRN
+      integer SLEEP
+      integer RD_USERS
+      integer WT_USERS
+
+end externals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                                GLOBALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+globals
+
+end globals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FUNCTIONS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+functions
+
+/*
+ --------------------------------------------------------------------------
+ |                                                                        |
+ |                           PASSWORD                                     |
+ |                                                                        |
+ --------------------------------------------------------------------------
+*/
+
+function PASSWORD(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+fixed LOGON
+fixed PSSWRD
+fixed PRMSSN
+fixed PWDATE
+
+begin
+
+   logical CONTINUE
+   fixed length 14 US_PSSWRD
+
+   use "USERS" as US
+
+   do CLRSCRN(4,21)
+
+   do FRAME("System Logon Procedure",fixed todays_date,"Press RETURN to ENTER")
+
+   store TRUE to CONTINUE
+
+   while CONTINUE
+
+      store "     " to LOGON
+
+      at 7,15 say "Please enter your identification."
+      at 9,15 say "Identification ... "
+      at 9,36 get LOGON using "!!!!!"
+
+      read screen
+      clear gets
+
+      store trim(LOGON) to LOGON
+
+      clear row 7
+      clear row 9
+
+      do GETPASS(7,"Please enter your password.",PSSWRD)
+
+      find first for ULOGON eq LOGON
+
+      if not FOUND
+         do STATUS(20,"SORRY : No such ID see System Administrator.")
+
+      else
+         do RD_USERS(LOGON,US_PSSWRD,PRMSSN,PWDATE)
+
+         if "              " eq US_PSSWRD
+
+            if (substring(PRMSSN,1,1) eq "B")
+               store "P" & substring(PRMSSN,2,9) to PRMSSN
+               store fixed todays_date to PWDATE
+
+               do WT_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+               do STATUS(20,"NOTICE : " & LOGON & " please remeber your new password.") 
+               store FALSE to CONTINUE					
+
+            else
+               store "I" & substring(PRMSSN,2,9) to PRMSSN
+
+               do WT_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+               do STATUS(20,"WARNING : Tampered PASSWORD, report to ADMINSTRATOR.")
+
+            end if
+
+         else
+            if PSSWRD ne trim(US_PSSWRD)
+               do STATUS(20,"SORRY : " & LOGON & " your password was not valid.")
+
+            else
+               if substring(US.PRMSSN,1,1) ne "P"
+                  store "T" & substring(PRMSSN,2,9) to PRMSSN
+
+                  do WT_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+                  do STATUS(20,"WARNING : Tampered PERMISSIONS, report to ADMINSTRATOR.")
+
+               else
+                  store FALSE to CONTINUE
+   
+               end if
+
+            end if
+
+         end if
+
+      end if
+
+   end while
+
+   unuse all
+
+   do CLRSCRN(4,21)
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |									 |
+ |                            CHNGPASS                                   |
+ |									 |
+ -------------------------------------------------------------------------
+*/
+
+function CHNGPASS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+fixed LOGON
+fixed PSSWRD
+fixed PRMSSN
+fixed PWDATE
+
+begin
+
+   fixed length 14 US_PSSWRD
+   fixed length 14 NEWPSSWRD
+   logical CONTINUE
+
+   do CLRSCRN(4,21)
+
+   do FRAME("Changing Your Password",fixed todays_date,"Press RETURN to ENTER")
+
+   use "USERS" as US
+
+   find first for ULOGON eq LOGON
+
+   do RD_USERS(LOGON,US_PSSWRD,PRMSSN,PWDATE)
+
+   store TRUE to CONTINUE
+
+   while CONTINUE
+
+      do GETPASS(7,"Please enter your old password.",PSSWRD)
+
+      if PSSWRD eq trim(US_PSSWRD)
+
+         do GETPASS(7,"Please enter your new password.",PSSWRD)
+
+         store PSSWRD to NEWPSSWRD
+
+         do GETPASS(7,"Please enter your new password a second time.",PSSWRD)
+
+         if NEWPSSWRD eq PSSWRD
+            if PSSWRD eq trim(US.PSSWRD)
+      	       do status(20,"Do not use your old password")
+
+     	    else
+               store NEWPSSWRD to PSSWRD
+               store fixed todays_date to PWDATE
+               do WT_USERS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+               do STATUS(20,"NOTICE : " & LOGON & " please remember your new password.")
+
+               store FALSE to CONTINUE
+
+            end if
+
+         else
+
+            do STATUS(20,"SORRY : Second entry did not match first, try again.")
+
+            store TRUE to CONTINUE
+
+         end if
+
+      else
+
+         do STATUS(20,"SORRY : " & LOGON & " your password was not valid.")
+
+         store TRUE to CONTINUE
+
+      end if
+
+   end while
+
+   unuse all
+
+   do CLRSCRN(4,21)
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |	                                                                 |
+ |                         GETPASS(RROW,PSSWRD)                          |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function GETPASS(RROW,PROMPT,PSSWRD)
+
+integer RROW
+fixed PROMPT
+fixed PSSWRD
+
+begin
+
+   fixed length 14 ENCODE
+   fixed length 67 MIX
+   fixed length 1 THEKEY
+   integer CODE
+   logical CONTINUE
+
+   do CLRSCRN(4,21)
+
+   at RROW,15 say PROMPT
+   at RROW+2,15 say "Password ......... [                 ]"
+   at RROW+2,36 say ""
+
+   store "" to PSSWRD
+
+   store TRUE to CONTINUE
+
+   while CONTINUE
+      wait to THEKEY
+
+      when asciicode(THEKEY)
+
+         is eq 10  
+            if length(trim(PSSWRD)) lt 4
+               do STATUS(20,"SORRY : Password must be at least 4 characters, try again.")
+               store "" to PSSWRD
+               at RROW+2,36 say ""
+
+            else
+               clear row RROW
+               clear row RROW+2
+
+               store uppercase(trim(PSSWRD)) to PSSWRD
+               store length(PSSWRD) to CODE
+
+               store FALSE to CONTINUE
+
+            end if
+
+         is eq BS
+            if length(PSSWRD) gt 1
+               at CUR_ROW,CUR_COL-1 say ""
+               store substring(PSSWRD,1,length(PSSWRD) - 1) to PSSWRD
+
+            else
+               at RROW+2,36 say ""
+               store "" to PSSWRD
+
+            end if
+
+         otherwise
+            if length(PSSWRD) lt 14
+               at CUR_ROW,CUR_COL+1 say ""
+               concatenate THEKEY to PSSWRD
+
+            end if
+
+      end when
+
+   end while
+
+   if CODE gt 7
+      store substring(PSSWRD,1,7) to PSSWRD
+      store 7 to CODE
+   end if
+
+   store "!1@2#3$4%5^6&7*8(9)0_-+=~`|\QWERT" to MIX
+   store "YUIP][ASDFGHJKOL:;'ZXCVBNM<,>.?/}{" & MIX to MIX
+   store PSSWRD to ENCODE
+   store fixed ((search(substring(ENCODE,CODE,1),MIX)) mod 13) to PSSWRD
+   store CODE - 1 to CODE
+
+   while CODE ne 0
+      store PSSWRD & fixed ((search(substring(ENCODE,CODE,1),MIX)) mod 17) to PSSWRD
+      store CODE - 1 to CODE
+
+   end while
+
+   do CLRSCRN(4,21)
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                           OLDPSSWRD(PWDATE)                           |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+logical function OLDPSSWRD(PWDATE)
+
+fixed PWDATE
+
+begin
+
+   fixed length 8 TODAY
+   integer OLDPW
+   integer NEWPW
+
+   store fixed todays_date to TODAY
+
+   store 366 * integer(substring(PWDATE,7,2)) to OLDPW
+   store OLDPW + (32 * integer(substring(PWDATE,1,2))) to OLDPW
+   store OLDPW + integer(substring(PWDATE,4,2)) to OLDPW
+
+   store 366 * integer(substring(TODAY,7,2)) to NEWPW
+   store NEWPW + (32 * integer(substring(TODAY,1,2))) to NEWPW
+   store NEWPW + integer(substring(TODAY,4,2)) to NEWPW
+
+   if OLDPW lt (NEWPW - 60)
+      return with TRUE
+
+   else
+      return with FALSE
+
+   end if
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                         HELLO_GOODBY(MESSAGE)                         |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function HELLO_GOODBY(GRETTINGS)
+
+fixed GRETTINGS
+
+begin
+
+   clear screen
+
+   at 4,1 say   "______________________________________________________________________________"
+   at 5,1 say   "______________________________________________________________________________"
+   at 20,1 say  "______________________________________________________________________________"
+   at 21,1 say  "______________________________________________________________________________"
+
+   at 7,(40 - (length(GRETTINGS)/2)) say GRETTINGS
+
+   at 9,8 say  "U. S. - W a s t e t r a c   M a n i f e s t   M a n a g e m e n t"
+   at 11,8 say "                    UTILITY SERVICES, INC."
+   at 12,8 say "                      3802 Danube Drive"
+   at 13,8 say "                    Groveport, Ohio 43125"
+   at 14,8 say "                       (614) 837-8827"
+
+   at 16,8 say "(C)opyright 1985, Personal Touch Software, All Rights Reserved."
+   at 18,8 say "              Licensed to Utility Services, Inc."
+
+   at 23,1 say ""
+
+end function
+
+end functions
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               MAIN                                    |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+main program
+
+begin
+
+   logical CONTINUE
+   logical REFRESH
+   fixed length 5 LOGON
+   fixed length 14 PSSWRD
+   fixed length 16 PRMSSN
+   fixed length 8 PWDATE
+
+   set talk off
+   set screen on
+
+   clear fkey[1] thru fkey[40]
+
+   do HELLO_GOODBY("Welcome to")
+
+   do SLEEP(5)
+
+   do PASSWORD(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+   if OLDPSSWRD(PWDATE)
+      do STATUS(20,"NOTICE : " & LOGON & " it is time to change your password.")
+
+      do CHNGPASS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+   end if
+
+   store TRUE to CONTINUE
+   store TRUE to REFRESH
+
+   while CONTINUE
+
+      if REFRESH
+         do FRAME("First Choice Menu",fixed todays_date,"Press ESC to STOP")
+
+         do MENU(5,"Manfiest Management","Vendor Management",
+            "System Management","Change Your Password","Logoff/Logon")
+
+      end if
+
+      when GETMKEY(5)
+
+         is eq ESC
+            store FALSE to CONTINUE
+
+         is eq 1
+            do MANIMANG(LOGON,PRMSSN)
+            store TRUE to REFRESH
+
+         is eq 2
+            do VENDMANG(LOGON,PRMSSN)
+            store TRUE to REFRESH
+
+         is eq 3
+	    if substring(PRMSSN,7,1) eq "U"
+	       do SYSMANG(LOGON)
+	       store TRUE to REFRESH
+
+	    else
+	       do STATUS(20,"SORRY : System managment permission denied.")
+	       store FALSE to REFRESH
+
+	    end if
+
+         is eq 4
+            do CHNGPASS(LOGON,PSSWRD,PRMSSN,PWDATE)
+            store TRUE to REFRESH
+
+         is eq 5
+            do PASSWORD(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+            if OLDPSSWRD(PWDATE)
+               do STATUS(20,"NOTICE : " & LOGON & " it is time to change your password.")
+
+               do CHNGPASS(LOGON,PSSWRD,PRMSSN,PWDATE)
+
+            end if
+
+            store TRUE to REFRESH
+
+      end when
+
+   end while
+
+   do HELLO_GOODBY("Thankyou for using")
+
+   do SLEEP(5)
+
+   set print off
+   clear screen
+   unuse all
+ 
+end program
+
+

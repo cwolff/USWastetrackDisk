@@ -1,0 +1,864 @@
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               SCREENIO.CE                             |
+ |                                                                       |
+ |   (C)opyright 1985 Personal Touch Software,  All Rights Reserved      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+identifications
+
+   module:  SCREENIO_CE
+   author:  clw
+   date:    09/28/85
+   remarks: (C)opyright 1985  Personal Touch Software  All Rights Reserved
+
+end identifications
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               CONSTANTS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+constants
+
+   includes
+      "track.h"
+   end includes
+
+end constants
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                              EXTERNALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+externals
+
+end externals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                                GLOBALS                                |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+globals
+
+end globals
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                               FUNCTIONS                               |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+functions
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |    GET_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function GET_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed CONTACT
+fixed PHONE
+
+begin
+
+   logical NO_HIT
+
+   do CLRSCRN(4,20)
+
+   use "GENERATE" as GEN
+
+   store TRUE to NO_HIT
+
+   while NO_HIT
+
+      store "            " to EPA_NO
+
+      at 10,15 say "Please enter the generator EPA number."
+      at 12,15 say "EPA number ... "
+      at 12,30 get EPA_NO using "!!!!!!!!!!!!"
+
+      read screen
+      clear gets
+
+      CLRSCRN(10,12)
+
+      find GENNO eq EPA_NO
+
+      if FOUND
+         do RD_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+         do PUT_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+         when GETVKEY(20,"1) This is the generator  2) Wrong generator",2)
+
+            is eq 1
+               store FALSE to NO_HIT
+
+            is eq 2
+               do STATUS(20,"No generator found for EPA number = " & EPA_NO)
+
+         end when
+
+   end while
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |    PUT_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function PUT_GEN(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed CONTACT
+fixed PHONE
+
+begin
+
+   do CLRSCRN(4,20)
+
+   at 6,1 say "EPA NO ... " & EPA_NO
+   at 6,27 say "Company ... " & COMPANY
+
+   at 7,27 say "Address ... " & ADDRESS
+
+   at 8,27 say "Location .. " & CITY & ", " & STATE & " " & ZIP
+
+   at 9,1 say "Phone .. " & PHONE
+   at 9,27 say " Contact .. " & CONTACT
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |  GET_P_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+GET_P_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed CONTACT
+fixed PHONE
+
+begin
+
+   logical NO_HIT
+
+   do CLRSCRN(4,20)
+
+   use "TRANSPRT" as TRA
+
+   store TRUE to NO_HIT
+
+   while NO_HIT
+
+      store "            " to EPA_NO
+
+      at 10,15 say "Please enter the transporter EPA number."
+      at 12,15 say "EPA number ... "
+      at 12,30 get EPA_NO using "!!!!!!!!!!!!"
+
+      read screen
+      clear gets
+
+      CLRSCRN(10,12)
+
+      find TRANO eq EPA_NO
+
+      if FOUND
+         do RD_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+         do PUT_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+         when GETVKEY(20,"1) This is the transporter  2) Wrong transporter",2)
+
+            is eq 1
+               store FALSE to NO_HIT
+
+            is eq 2
+               do STATUS(20,"No transporter found for EPA number = " & EPA_NO)
+
+         end when
+
+   end while
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |  GET_S_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+GET_S_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed CONTACT
+fixed PHONE
+
+begin
+
+   store TRUE to NO_HIT
+
+   while NO_HIT
+
+      store "            " to EPA_NO
+
+      at 10,15 say "Please enter the secondary transporter EPA number"
+      at 12,15 say "EPA number (Press RETURN if NONE) ... ";
+      at 12,52 get EPA_NO using "!!!!!!!!!!!!"
+
+      read screen
+      clear gets
+
+      CLRSCRN(10,12)
+
+      if EPA_NO ne ""
+
+         find TRANO eq EPA_NO
+
+         if FOUND
+            do RD_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+            do PUT_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+            when GETVKEY(20,"1) This is the transporter  2) Wrong transporter",2)
+
+               is eq 1
+                  store FALSE to NO_HIT
+
+               is eq 2
+                  do STATUS(20,"No transporter found for EPA number = " & EPA_NO)
+
+            end when
+
+         end if
+
+      else
+         store "" to EPA_NO
+         store "" to COMPANY
+         store "" to ADDRESS
+         store "" to CITY
+         store "" to STATE
+         store "" to ZIP
+         store "" to CONTACT
+         store "" to PHONE
+
+      end if
+
+   end while
+
+return
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |    PUT_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function PUT_TRA(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed CONTACT
+fixed PHONE
+
+begin
+
+   do CLRSCRN(4,20)
+
+   at 6,1 say "EPA NO ... " & EPA_NO
+   at 6,27 say "Company ... " & COMPANY
+
+   at 7,27 say "Address ... " & ADDRESS
+
+   at 8,27 say "Location .. " & CITY & ", " & STATE & " " & ZIP
+
+   at 9,1 say "Phone .. " & PHONE
+   at 9,27 say " Contact .. " & CONTACT
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |    GET_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)    |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function GET_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed CONTACT
+fixed PHONE
+
+begin
+
+   logical NO_HIT
+
+   do CLRSCRN(4,20)
+
+   use "TSD" as TSD
+
+   store TRUE to NO_HIT
+
+   while NO_HIT
+
+      store "            " to EPA_NO
+
+      at 10,15 say "Please enter the TSD EPA number."
+      at 12,15 say "EPA number ... "
+      at 12,30 get EPA_NO using "!!!!!!!!!!!!"
+
+      read screen
+      clear gets
+
+      CLRSCRN(10,12)
+
+      find TSDNO eq EPA_NO
+
+      if FOUND
+         do RD_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+         do PUT_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+         when GETVKEY(20,"1) This is the TSD  2) Wrong TSD",2)
+
+            is eq 1
+               store FALSE to NO_HIT
+
+            is eq 2
+               do STATUS(20,"No TSD found for EPA number = " & EPA_NO)
+
+         end when
+
+   end while
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |   PUT_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)     |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function PUT_TSD(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed CONTACT
+fixed PHONE
+
+begin
+
+   do CLRSCRN(4,20)
+
+   at 6,1 say "EPA NO ... " & EPA_NO
+   at 6,27 say "Company ... " & COMPANY
+
+   at 7,27 say "Address ... " & ADDRESS
+
+   at 8,27 say "Location .. " & CITY & ", " & STATE & " " & ZIP
+
+   at 9,1 say "Phone .. " & PHONE
+   at 9,27 say " Contact .. " & CONTACT
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |                     GET_MAN(MAN_NO,MAN_DATE)                       |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function GET_MAN(MAN_NO,MAN_DATE)
+
+fixed MAN_NO
+fixed MAN_DATE
+
+begin
+
+   logical CONTINUE
+
+   store TRUE to CONTINUE
+
+   CLRSCRN(4,20)
+
+   use "MANIFEST" as MAN
+
+   while CONTINUE
+
+      store "            -      "to MAN_NO
+
+      at 10,15 say "Please enter the manifest document number."
+      at 12,15 say "document number ... "
+      at 12,32 get MAN_NO using "!!!!!!!!!!!!-!!!!!!"
+
+      read screen
+      clear gets
+
+      if MAN_NO eq ""
+         store FALSE to FOUND
+         store FALSE to CONTINUE
+
+      else
+         store subtring(MAN_NO,1,12) & substring(MAN_NO,14,6))
+
+         find first for MANNO eq MAN_NO
+
+         if FOUND
+            RD_MAN(MAN_NO,MAN_DATE)
+
+            store FALSE to CONTINUE
+
+         else
+            do STATUS(20,"SORRY : Manifest not found for manifest number = " & MAN_NO)
+
+      end if
+
+   end while
+
+   CLRSCRN(10,12)
+
+end function
+
+/*
+ ----------------------------------------------------------------------
+ |                                                                    |
+ |                      PUT_MAN(MAN_NO)                               |
+ |                                                                    |
+ ----------------------------------------------------------------------
+*/
+
+function PUT_MAN(MAN_NO,MAN_DATE)
+
+fixed MAN_NO
+fixed MAN_DATE
+
+begin
+
+   fixed length 12 EPA_NO
+   fixed length 40 COMPANY
+   fixed length 30 ADDRESS
+   fixed length 25 CITY
+   fixed length 2 STATE
+   fixed length 9 ZIP
+
+   do CLRSCRN(4,20)
+
+   do RD_MAN_GEN(EPA_NO,COMPANY,ADDRESS,CITY,ZIP,STATE,ZIP)
+
+   at 5,1 say "Generator >>>"
+   at 5,27 say "Company ... " & COMPANY
+
+   at 6,1 say "EPA NO ... " & EPA_NO
+   at 6,27 say "Address ... " & ADDRESS
+
+   at 7,27 say "Location .. " & CITY & ", " & STATE & " " & ZIP
+
+   do RD_MAN_PRI(EPA_NO,COMPANY,ADDRESS,CITY,ZIP,STATE,ZIP)
+
+   at 9,1 say "Primary Transporter >>>"
+   at 9,27 say "Company ... " & COMPANY
+
+   at 10,1 say "EPA NO ... " & EPA_NO
+   at 10,27 say "Address ... " & ADDRESS
+
+   at 11,27 say "Location .. " & CITY & ", " & STATE & " " & ZIP
+
+   do RD_MAN_SEC(EPA_NO,COMPANY,ADDRESS,CITY,ZIP,STATE,ZIP)
+
+   at 13,1 say "Secondary Transporter >>>"
+   at 13,27 say "Company ... " & COMPANY
+
+   at 14,1 say "EPA NO ... " & EPA_NO
+   at 14,27 say "Address ... " & ADDRESS
+
+   at 15,27 say "Location .. " & CITY & ", " & STATE & " " & ZIP
+
+   do RD_MAN_TSD(EPA_NO,COMPANY,ADDRESS,CITY,ZIP,STATE,ZIP)
+
+   at 17,1 say "Secondary Transporter >>>"
+   at 17,27 say "Company ... " & COMPANY
+
+   at 18,1 say "EPA NO ... " & EPA_NO
+   at 18,27 say "Address ... " & ADDRESS
+
+   at 19,27 say "Location .. " & CITY & ", " & STATE & " " & ZIP
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |      PUT_ITEM(ITEM,UN_NA,DESC_1,DESC_2,CNT_NO,CNT_TYP,QNTY,UNIT)      |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function PUT_ITEM(ITEM,UN_NA,DESC_1,DESC_2,CNT_NO,CNT_TYP,QNTY,UNIT)
+
+fixed ITEM
+fixed UN_NA
+fixed DESC_1
+fixed DESC_2
+fixed CNT_NO
+fixed CNT_TYP
+fixed QNTY
+fixed UNIT
+
+begin
+
+   integer RROW
+
+   store ((ITEM - 1) * 4) + 5 to RROW
+
+   if (ITEM eq 1) or (ITEM eq 2)
+      do CLRSCRN(4,20)
+   end if
+
+   at RROW,9 say UN_NA
+   at RROW+1,9 say DESC_1
+   at RROW+2,9 say DESC_2
+   at RROW+3,64 say CNT_NO
+   at RROW+3,68 say CNT_TYP
+   at RROW+3,71 say QNTY
+   at RROW+3,77 say UNIT
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |        GET_ITEM >>> Get a item for transport                                 |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function GET_ITEM(UN_NA,DESC_1,DESC_2,CNT_NO,CNT_TYP,QNTY,UNIT,SAVE)
+
+fixed UN_NA
+fixed DESC_1
+fixed DESC_2
+fixed CNT_NO
+fixed CNT_TYP
+fixed QNTY
+fixed UNIT
+logical SAVE
+
+begin
+
+   logical NO_HIT
+   logical CONTAINER
+   logical UNIT
+
+   use "WASTE" as WASNO
+
+   store "          " to UN_NA
+   store "                                                             " to DESC1
+   store "                                                             " to DESC2
+   store "   " to CNT_NO
+   store "  " to CNT_TYP 
+   store "     " to QNTY 
+   store "   " to UNIT 
+
+   store TRUE to NO_HIT
+
+   while NO_HIT
+
+      store "        " to UN_NA
+
+      at 10,15 say "Please enter the hazardous waste UN/NA number."
+      at 12,15 say "waste UN/NA number ... "
+      at 12,38 get UN_NA using "!!!!!!"
+
+      read screen
+      clear gets
+ 
+      do CLRSCRN(10,12)
+
+      use "WASTE" as WAS
+
+      find first for WASUNNA as UN_NA
+
+      if FOUND
+         at 5,15 say "You have selected the following hazardous waste item."
+
+         do RD_WAS(UN_NA,DESC_1,DESC_2)
+
+         at 7,10 say DESC_1
+         at 8,10 say DESC_2
+
+         when VERT_MENU(20,"1) This is the item  2) Wrong item",2)
+
+            is eq 1
+               do CLRSCRN(5,8)
+      
+               store "   " to M_CNTNO
+
+               while CNTNO eq "  "
+                  at 10,15 say "Please enter the number of containers to be shipped."
+                  at 12,15 say "number of containers ... "
+                  at 12,40 get CNTNO using "###"
+
+                  read screen
+                  clear gets
+
+               end while
+
+               do CLRSCRN(10,12)
+
+               at 5,15 say "DM  =  metal drums, barrels, kegs"
+               at 6,15 say "DW  =  wooden drums, barrels, kegs"
+               at 7,15 say "DF  =  fiberboard or plastic drums, barrels, kegs"
+               at 8,15 say "TP  =  tanks portable"
+               at 9,15 say "TT  =  cargo tanks (tank trucks)"
+               at 10,15 say "TC  =  tank cars"
+               at 11,15 say "DT  =  dump trucks"
+               at 12,15 say "CY  =  cylinders"
+               at 13,15 say "CM  =  metal boxes, cartons, cases (including roll-offs)"
+               at 14,15 say "CW  =  wooden boxes cartons cases"
+               at 15,15 say "CF  =  fiber or plastic boxes, cartons, cases"
+               at 16,15 say "BA  =  burlap, cloth, paper or plastic bags"
+
+               store TRUE to CONTAINER
+
+               while CONTAINER
+
+                  store "  " to CNT_TYP 
+
+                  while CNT_TYP eq "  "
+                     at 18,25 say "Enter container type ... "
+                     at 18,50 get CNT_TYP using "!!"
+
+                     read screen
+                     clear gets
+
+                  end while
+
+                  do CLRSCRN(18,19)
+
+                  when CNT_TYP
+
+                     is eq "DM"
+                        store FALSE to CONTAINER
+
+                     is eq "DW"
+                        store FALSE to CONTAINER
+
+                     is eq "DF"
+                        store FALSE to CONTAINER
+
+                     is eq "TP"
+                        store FALSE to CONTAINER
+
+                     is eq "TT"
+                        store FALSE to CONTAINER
+
+                     is eq "TC"
+                        store FALSE to CONTAINER
+
+                     is eq "DT"
+                        store FALSE to CONTAINER
+
+                     is eq "CY"
+                        store FALSE to CONTAINER
+
+                     is eq "CM"
+                        store FALSE to CONTAINER
+
+                     is eq "CW"
+                        store FALSE to CONTAINER
+
+                     is eq "CF"
+                        store FALSE to CONTAINER
+
+                     is eq "BA"
+                        store FALSE to CONTAINER
+
+                     otherwise
+                        do STATUS(20,"SORRY : No such container type as " & CNT_TYP)
+
+                  end when
+
+               end while
+
+               do CLRSCRN(4,20)
+
+               store "   " to QNTY
+
+               while QNTY eq "   "
+                  at 10,15 say "Please enter the total quantity of waste."
+                  at 12,15 say "quantity ... "
+                  at 12,28 get QNTY using "#####"
+
+                  read screen
+                  clear gets
+
+               end while
+
+               do CLRSCRN(10,12)
+
+               at 7,15 say "G  =  gallons (liquids only)"
+               at 8,15 say "P  =  pounds"
+               at 9,15 say "T  =  tons (2000 lbs)"
+               at 10,15 say "Y  =  cubic yards"
+               at 11,15 say "L  =  liters (liquids only)"
+               at 12,15 say "K  =  kilograms"
+               at 13,15 say "M  =  metric tons (1000 kg)"
+               at 14,15 say "N  =  cubic meters"
+
+               store TRUE to UNIT
+
+               while UNIT
+
+                  store " " to UNIT
+
+                  while M_UNIT eq " "
+                     at 17,20 say "Enter UNIT wt/vol ... "
+                     at 17,42 get M_UNIT using "!"
+
+                     read
+                     clear gets
+
+                  end while
+
+                  do CLRSCRN(17,18)
+
+                  when UNIT
+
+                     is eq "G"
+                        store FALSE to UNIT
+
+                     is eq "P"
+                        store FALSE to UNIT
+
+                     is eq "T"
+                        store FALSE to UNIT
+
+                     is eq "Y"
+                        store FALSE to UNIT
+
+                     is eq "L"
+                        store FALSE to UNIT
+
+                     is eq "K"
+                        store FALSE to UNIT
+
+                     is eq "M"
+                        store FALSE to UNIT
+
+                     is eq "N"
+                        store FALSE to UNIT
+
+                     otherwise
+                        do STATUS(20,"SORRY : No such UNIT as " & UNIT)
+
+                  end when
+
+               end while
+
+               do CLRSCRN(4,20)
+
+               when VERT_MENU(20,"1) Save hazardous waste item  2) Throw it away",2)
+
+                  is eq 1
+                     do WT_ITEM(
+                     store FALSE to NO_HIT
+                     store TRUE to SAVE
+
+                  is eq 2
+                     store FALSE to NO_HIT
+                     store FALSE to SAVE
+
+               end when
+
+            is eq 2
+               store TURE to NO_HIT
+
+         end when
+
+      else
+         do STATUS(20,"SORRY : No waste found for NU/NA number = " & UN_NA)
+
+      end if
+
+   end while
+
+end function
+
+end functions
+
+
+

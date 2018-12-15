@@ -1,0 +1,202 @@
+/+----------------- COMPULSORY IDENTIFICATION SECTION ---------------------
+
+IDENTIFICATIONS
+
+	SYSTEM:		SYS_TEST
+	APPLICATION:	APP_TEST
+	PROGRAM:	PRO_TEST
+	MODULE:		MOD_TEST
+    	AUTHOR:		AUT_TEST
+    	DATE:		01/01/85
+	REMARKS:	A framework that can be copied as any cENGLISH
+			source file and used as a guide to write an
+			organized cENGLISH program.
+
+END IDENTIFICATIONS
+
+/+---------------- OPTIONAL CONSTANTS SECTION ----------------------------
+
+CONSTANTS
+
+END CONSTANTS
+
+/+--------------- OPTIONAL EXTERNALS SECTION -----------------------------
+
+EXTERNALS
+
+END EXTERNALS
+
+/+--------------- OPTIONAL GLOBALS SECTION -------------------------------
+
+GLOBALS
+
+/#C+#include	<stdio.h>
+
+/#C+FILE *CFP;
+
+END GLOBALS
+
+/+--------------- OPTIONAL FUNCTIONS SECTION -----------------------------
+
+FUNCTIONS
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |                 CONVERT_VENDOR(file to convert)                       |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+function CONVERT_VENDOR(CONVERT_FILE)
+
+fixed CONVERT_FILE
+
+begin
+
+   integer REC_COUNT
+   integer SIZE
+   FIXED LENGTH 2 CRLF
+
+/#C+CFP = fopen(CONVERT_FILE,"r");
+
+   store 1 to REC_COUNT
+
+   clear screen
+
+   at 4,1 say "Record number: "
+
+   while GET_VEN_REC(VF.EPA_NO,VF.COMPANY,VF.ADDRESS,VF.CITY,VF.STATE,VF.ZIP,VF.PHONE,VF.CONTACT)
+
+      at 4,17 say REC_COUNT using "####"
+
+      at 10,10 say VF.EPA_NO
+      at 12,10 say VF.COMPANY
+      at 13,10 say VF.ADDRESS
+      at 14,10 say VF.CITY
+      at 15,10 say VF.STATE
+      at 16,10 say VF.ZIP
+      at 18,10 say VF.PHONE
+      at 19,10 say VF.CONTACT
+
+      append
+         VF.EPA_NO = VF.EPA_NO
+         VF.COMPANY = VF.COMPANY
+         VF.ADDRESS = VF.ADDRESS
+         VF.CITY = VF.CITY
+         VF.STATE = VF.STATE
+         VF.ZIP = VF.ZIP
+         VF.PHONE = VF.PHONE
+         VF.CONTACT = VF.CONTACT
+      end append
+
+      store REC_COUNT + 1 to REC_COUNT
+
+   end while
+
+end function
+
+/*
+ -------------------------------------------------------------------------
+ |                                                                       |
+ |    GET_VEN_REC(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)   |
+ |                                                                       |
+ -------------------------------------------------------------------------
+*/
+
+logical function GET_VEN_REC(EPA_NO,COMPANY,ADDRESS,CITY,STATE,ZIP,PHONE,CONTACT)
+
+fixed EPA_NO
+fixed COMPANY
+fixed ADDRESS
+fixed CITY
+fixed STATE
+fixed ZIP
+fixed PHONE
+fixed CONTACT
+
+begin
+
+   logical RETURN_VAL
+
+   /#C*
+
+   {
+      int n;
+      char crlf[2];
+
+      n = fscanf(CFP,"%12c %30c %30c %25c %2c %9c %10c %20c %c",
+         EPA_NO, COMPANY, ADDRESS, CITY, STATE, ZIP, PHONE, CONTACT, &crlf);
+
+      RETURN_VAL = (n == EOF) ? _FALSE : _TRUE;
+
+   }
+
+   #/
+
+   return with RETURN_VAL
+
+end function
+
+END FUNCTIONS
+
+/+-----------------------------------------------------------------------
+
+/************************************************************************
+ ************************************************************************
+
+           *        *      *      *   *       *
+           **      **     * *     *   *  *    *
+           *  *   * *    *****    *   *    *  *
+           *   * *  *   *     *   *   *     * *
+           *    *   *  *       *  *   *       *
+
+ ************************************************************************
+ ************************************************************************/
+			  
+/+---------------- OPTIONAL MAIN PROGRAM SECTION ----------------------
+
+MAIN PROGRAM       /+ PROGRAM EXECUTION STARTS HERE
+
+/+---------------- OPTIONAL MAIN ARGUMENT SECTION -----------------------
+
+BEGIN
+
+/+---------------- OPTIONAL MAIN VARIABLES SECTION ----------------------
+
+   fixed length 15 VENDOR_FILE
+
+   set talk off
+
+   clear screen
+
+   remove database file "GENERATE"
+   copy database file "VENDOR" to "GENERATE"
+   store "GENERATE" to VENDOR_FILE
+   use VENDOR_FILE using "VENDOR" as VF
+   do CONVERT_VENDOR("GENERATE.TXT") 
+   unuse "GENERATE"
+
+   remove database file "TRANSPRT"
+   copy database file "VENDOR" to "TRANSPRT"
+   store "TRANSPRT" to VENDOR_FILE
+   use VENDOR_FILE using "VENDOR" as VF
+   do CONVERT_VENDOR("TRANSPRT.TXT")
+   unuse "TRANSPRT"
+
+   remove database file "TSD"
+   copy database file "VENDOR" to "TSD"
+   store "TSD" to VENDOR_FILE
+   use VENDOR_FILE using "VENDOR" as VF
+   do CONVERT_VENDOR("TSD.TXT")
+   unuse "TSD"
+
+   clear screen
+
+   unuse all
+
+END PROGRAM
+
+/+----------------- END OF PROGRAM --------------------------------------
+
+

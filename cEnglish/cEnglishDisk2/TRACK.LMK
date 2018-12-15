@@ -1,0 +1,39 @@
+#
+# LMK facility for Utility Services Wastrac
+#
+
+CE=ce -c
+LIB=\\lib\\
+   
+track.exe: track.obj manimang.obj vendmang.obj sysmang.obj fileio.obj utility.obj 
+	link $(LIB)cp @track.lnk,track.exe,NUL,@$(LIB)celib
+
+track.obj: track.ce
+	del track.obj
+	$(CE) track
+
+manimang.obj: manimang.ce
+	del manimang.obj
+	$(CE) manimang.ce
+
+vendmang.obj: vendmang.ce
+	del vendmang.obj
+	$(CE) vendmang.ce
+
+sysmang.obj: sysmang.ce
+	del sysmang.obj
+	$(CE) sysmang.ce
+
+fileio.obj: fileio.ce
+	del fileio.obj
+	$(CE) fileio.ce
+
+utility.obj: utility.ce
+	del utility.obj
+	$(CE) utility.ce
+
+#convert.obj: convert.ce
+#	del convert.obj
+#	$(CE) convert.ce
+
+
